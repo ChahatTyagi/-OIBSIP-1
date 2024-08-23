@@ -1,0 +1,225 @@
+import java.util.*;  
+class Book 
+{  
+    String title;  
+    String author;  
+    boolean isIssued;  
+    String issuedTo;  
+    Date issueDate; 
+    Book(String title, String author) 
+    {  
+        this.title = title;  
+        this.author = author;  
+        this.isIssued = false;  
+    }  
+    long calculateFine() 
+    {  
+        if (!isIssued) 
+          return 0;  
+        long daysLate = (new Date().getTime() - issueDate.getTime()) / (1000 * 60 * 60 * 24);  
+        return (daysLate > 0) ? daysLate * 1000: 0; 
+    }  
+}  
+class Admin 
+{  
+    List<Book> books = new ArrayList<>();  
+    void addBook(String title, String author) 
+    {  
+        books.add(new Book(title, author));  
+        System.out.println("Book added: " + title);  
+    }  
+    void deleteBook(String title) 
+    {  
+        books.removeIf(book -> book.title.equalsIgnoreCase(title));  
+        System.out.println("Book deleted: " + title);  
+    }  
+    void viewBooks() 
+    {  
+        if (books.isEmpty()) 
+        {  
+            System.out.println("No books available.");  
+            return;  
+        }  
+        System.out.println("Available Books");  
+        for (Book book : books) {  
+            System.out.println("Title: " + book.title + ", Author: " + book.author + ", Issued: " + book.isIssued);  
+        }  
+    }  
+    void modifyBook(String currentTitle, String newTitle, String newAuthor) 
+    {  
+        for (Book book : books) 
+        {  
+            if (book.title.equalsIgnoreCase(currentTitle)) 
+            {  
+                book.title = newTitle;  
+                book.author = newAuthor;  
+                System.out.println("Book modified: " + newTitle);  
+                return;  
+            }  
+        }  
+        System.out.println("Book not found.");  
+    }  
+}  
+class User 
+{  
+    void viewBooks(List<Book> books) 
+    {  
+        if (books.isEmpty()) 
+        {  
+            System.out.println("No books available.");  
+            return;  
+        }  
+        System.out.println("Available Books");  
+        for (Book book : books) 
+        {  
+            System.out.println("Title: " + book.title + ", Author: " + book.author + ", Issued: " + book.isIssued);  
+        }  
+    }  
+    void issueBook(String title, List<Book> books, String userName) 
+    {  
+        for (Book book : books) 
+        {  
+            if (book.title.equalsIgnoreCase(title) && !book.isIssued) 
+            {  
+                book.isIssued = true;  
+                book.issuedTo = userName;  
+                book.issueDate = new Date();  
+                System.out.println("Book issued: " + title + " to " + userName);  
+                return;  
+            }  
+        }  
+        System.out.println("Book not available for issue.");  
+    }  
+    void returnBook(String title, List<Book> books) 
+    {  
+        for (Book book : books) 
+        {  
+            if (book.title.equalsIgnoreCase(title) && book.isIssued) 
+            {  
+                long fine = book.calculateFine();  
+                book.isIssued = false;  
+                book.issuedTo = null;  
+                book.issueDate = null;  
+                if (fine > 0) {  
+                    System.out.println("Book returned: " + title + ". Fine for late return: Rs." + fine);  
+                } else {  
+                    System.out.println("Book returned: " + title + ". No fine.");  
+                }  
+                return;  
+            }  
+        }  
+        System.out.println("Book not currently issued or not found.");  
+    }  
+}  
+public class DigitalLibraryManagement 
+{  
+    public static void main(String[] args) 
+    {  
+        Scanner scanner = new Scanner(System.in);  
+        Admin admin = new Admin();  
+        User user = new User();  
+        String choice;  
+        while (true) 
+        {  
+            System.out.println("\nDigital Library Management System");  
+            System.out.println("1. Admin Actions");  
+            System.out.println("2. User Actions"); 
+            System.out.println("3. Exit");
+            System.out.print("Choose your action: ");  
+            choice = scanner.nextLine();  
+            switch (choice) 
+            {  
+                case "1":  
+                    while (true) 
+                    {  
+                        System.out.println("Admin Menu");  
+                        System.out.println("1. Add Book");  
+                        System.out.println("2. Delete Book");  
+                        System.out.println("3. View Books");  
+                        System.out.println("4. Modify Book");  
+                        System.out.println("5. Exit Admin Menu");  
+                        System.out.print("Choose your action: ");  
+                        String adminChoice = scanner.nextLine();  
+
+                        switch (adminChoice) 
+                        {  
+                            case "1":  
+                                System.out.print("Enter book title: ");  
+                                String title = scanner.nextLine();  
+                                System.out.print("Enter book author: ");  
+                                String author = scanner.nextLine();  
+                                admin.addBook(title, author);  
+                                break;  
+                            case "2":  
+                                System.out.print("Enter book title to delete: ");  
+                                String deleteTitle = scanner.nextLine();  
+                                admin.deleteBook(deleteTitle);  
+                                break;  
+                            case "3":  
+                                admin.viewBooks();  
+                                break;  
+                            case "4":  
+                                System.out.print("Enter current title of the book to modify: ");  
+                                String currentTitle = scanner.nextLine();  
+                                System.out.print("Enter new title: ");  
+                                String newTitle = scanner.nextLine();  
+                                System.out.print("Enter new author: ");  
+                                String newAuthor = scanner.nextLine();  
+                                admin.modifyBook(currentTitle, newTitle, newAuthor);  
+                                break;  
+                            case "5":  
+                                break;  
+                            default:  
+                                System.out.println("Invalid choice.");  
+                        }  
+                        if (adminChoice.equals("5")) 
+                        break;  
+                    }  
+                    break;  
+                case "2":  
+                    while (true) 
+                    {  
+                        System.out.println("User Menu");  
+                        System.out.println("1. View Books");  
+                        System.out.println("2. Issue Book");  
+                        System.out.println("3. Return Book");  
+                        System.out.println("4. Exit User Menu");  
+                        System.out.print("Choose your action: ");  
+                        String userChoice = scanner.nextLine(); 
+                        switch (userChoice) 
+                        {  
+                            case "1":  
+                                user.viewBooks(admin.books);  
+                                break;  
+                            case "2":  
+                                System.out.print("Enter book title to issue: ");  
+                                String issueTitle = scanner.nextLine();  
+                                System.out.print("Enter your name: ");  
+                                String userName = scanner.nextLine();  
+                                user.issueBook(issueTitle, admin.books, userName);  
+                                break;  
+                            case "3":  
+                                System.out.print("Enter book title to return: ");  
+                                String returnTitle = scanner.nextLine();  
+                                user.returnBook(returnTitle, admin.books);  
+                                break;  
+                            case "4":  
+                                break;  
+                            default:  
+                                System.out.println("Invalid choice.");  
+                        }  
+                        if (userChoice.equals("4")) 
+                        break;  
+                    }  
+                    break;  
+                case "3":
+                    System.out.println("If you have any query then you can email us at digilibmanage2024@gmail.com . Thankyou!");
+                    System.out.println("Exiting system!");  
+                    scanner.close();  
+                    return;
+                default:  
+                    System.out.println("Invalid choice.");  
+            }  
+        }  
+    }  
+}
